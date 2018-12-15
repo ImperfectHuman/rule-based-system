@@ -72,7 +72,7 @@ An action is a class with the following methods:
 
 ### Rule
 
-A `Rule` is an object with properties:
+A `Rule` is an object that MUST have properties:
 
 * `priority` - An integer greater than `0` indicating the priority of the `Rule`
   relative to others. Lower numbers are higher priority - so priority `1` is the
@@ -90,7 +90,7 @@ The `KnowledgeBase` is the set of rules used during processing. It's passed into
 the `orchestrator` when asking it to process, and is queried to load the rules
 of the system.
 
-The knowledge base is an object with the following property:
+The knowledge base MUST have the following property:
 
 * `rules` - an Array of `Rule` objects.
 
@@ -102,13 +102,10 @@ it to be updated by an `Action`, as this could lead to a chaotic system. Using
 the state and `action.canExecute(state)` is likely simpler to understand and
 maintain for most purposes.
 
-
 ### ActionLibrary
 
-In order to process a `Rule` the `Action` needs to be loaded. The `ActionLibrary`
-you pass to the `orchestrator` performs this loading, and provides `Action`
-classes as required.
-
+In order to process a `Rule` the `Action` needs to be fetched. The `ActionLibrary`
+you pass to the `orchestrator` does this, providing `Action` classes as required.
 
 `ActionLibrary` has the following methods:
 
@@ -129,13 +126,13 @@ The orchestrator is an `async` function used to invoke the processing of the
 starting state through the rules in the knowledge base.
 
 ```
-const endState = await orchestrator(startState, knowledgeBase, actionLoader, hooks);
+const endState = await orchestrator(startState, knowledgeBase, actionLibrary, hooks);
 ```
 
 Arguments:
 * `startState` - the initial state for the system.
 * `knowledgeBase` - the `KnowledgeBase` to use.
-* `actionLoader` - the `ActionLoader` to use.
+* `actionLibrary` - the `ActionLibrary` to use.
 * `hooks` - an object providing hooks to alter the behaviour of the system (e.g.
   to add logging of system behaviour)
 
@@ -144,20 +141,25 @@ properties: `tiebreaker`, `selected`, `executed`
 
 #### Hooks
 
-##### tiebreaker(rules)
+##### async tiebreaker(compiledRules)
 
-A function which takes an Array of rules of equal priority and determines which
-of them to use. The default tiebreaker returns an arbitrary rule.
+A function which takes an Array of compiled rules of equal priority and
+determines which of them to use. A compiled rule is guaranteed to have a
+property `rule` that contains the original rule
+
+The default tiebreaker returns an arbitrary rule.
 
 Advanced users of this system could implement additional `Rule` properties to
 allow tie-breaking based on heuristics such as the cost of an action, picking
 the most (or least) frequently used action, the most recently updated item, etc.
 
-##### selected(rule)
+##### async selected(rule, state)
 
 A function which is called when the specified `Rule` is determined to be the
-highest priority executable rule, but prior to it being executed.
+highest priority executable rule, but prior to it being executed on the given
+state.
 
-##### executed(rule)
+##### async executed(rule, state)
 
-A function that is called after the specified `Rule` has been executed.
+A function that is called after the specified `Rule` has been executed,
+resulting in the given state.

@@ -2,9 +2,9 @@
   "name": "rule-based-system",
   "version": "0.0.1",
   "description": "With a complex system to manage we can often break it up into individual rules, and combine those in order to provide the overall behaviour. Doing so is flexible, because by changing the priority order of those rules you can change the algorithmic behaviour of the system as a whole. This has the potential to simplify a complex system's logic.",
-  "main": "index.js",
+  "main": "orchestrator.js",
   "scripts": {
-    "test": "jest"
+    "test": "jest --verbose true"
   },
   "repository": {
     "type": "git",
