@@ -36,13 +36,11 @@ This framework of a rule-based system is split up into several parts:
 * A set of actions, which update the state when run.
 * A knowledge base, which is a set of rules the system uses to process the state.
 * Rules that pair a priority with an action.
-* An orchestrator function which ties all these items together, and acts as the
-  entry point into the system.
+* An orchestrator function which ties all these items together, and coordinates
+  processing.
 
-You will need to provide most of these elements, as they are specific to your
-system, but it is hoped that by following the structure laid out here, and
-by making use of the common orchestrator function, you will be able to quickly
-produce your own rule-based system.
+You will need to provide the initial state, actions, and knowledge base of
+rules, as they are specific to your system.
 
 ## API
 
@@ -53,9 +51,9 @@ interpreted as described in RFC 2119.
 ### Action
 
 For your system to be useful the actions will have to be tailored to it. All
-actions are loaded by the `orchestrator` using an `ActionLoader` (see below).
+actions are passed to the `orchestrator` using an `ActionLibrary` (see below).
 
-An action is a class with the following methods:
+An `Action` is a class that MUST have the following methods:
 
 * A constructor that takes an action-specific `config` object, which MAY be
   specified by the `Rule` in the `KnowledgeBase`. If not specified `undefined`
@@ -68,7 +66,8 @@ An action is a class with the following methods:
   system and performs some processing. It MUST return the new state of the
   system after it has processed. It is RECOMMENDED that you decide up-front if
   `execute` functions are allowed to modify the input state that is provided,
-  and document that decision appropriately for future maintainers.
+  apply that decision consistently, and document it appropriately for future
+  maintainers.
 
 ### Rule
 
@@ -81,8 +80,6 @@ A `Rule` is an object that MUST have properties:
 * `actionConfig` (optional) - An object passed to the specified rule during
   construction. This is intended to allow rule re-use where there may be minor
   variations (e.g. different messages to give to a user in a "display" action).
-
-Other properties are ignored.
 
 ### KnowledgeBase
 
@@ -141,13 +138,12 @@ properties: `tiebreaker`, `selected`, `executed`
 
 #### Hooks
 
-##### async tiebreaker(compiledRules)
+##### async tiebreaker(rules)
 
-A function which takes an Array of compiled rules of equal priority and
-determines which of them to use. A compiled rule is guaranteed to have a
-property `rule` that contains the original rule
+A function which takes an Array of rules of equal priority and determines which
+of them to use. It MUST return the index of the desired rule.
 
-The default tiebreaker returns an arbitrary rule.
+The default tiebreaker returns an arbitrary rule in the rules list.
 
 Advanced users of this system could implement additional `Rule` properties to
 allow tie-breaking based on heuristics such as the cost of an action, picking

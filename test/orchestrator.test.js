@@ -115,7 +115,7 @@ describe("orchestrator", () => {
         ];
 
         const hooks = {
-          tiebreaker: rules => rules[rules.length - 1]
+          tiebreaker: rules => rules.length - 1
         };
 
         const endState = await orchestrator({}, { rules }, actions, hooks);

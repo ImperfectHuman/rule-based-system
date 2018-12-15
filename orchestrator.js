@@ -1,5 +1,5 @@
 const DEFAULT_HOOKS = {
-  tiebreaker: async (rules) => rules[0],
+  tiebreaker: async (rules) => 0,
   selected: async (rule, state) => { },
   executed: async (rule, state) => { }
 }
@@ -37,12 +37,11 @@ module.exports = async (startState, knowledgeBase, actionLibrary, userHooks) => 
     }
 
     if (executable.length) {
-      let chosen;
-      if (executable.length == 1) {
-        chosen = executable[0];
-      } else {
-        chosen = await hooks.tiebreaker(executable);
+      let chosenIndex = 0;
+      if (executable.length > 1) {
+        chosenIndex = await hooks.tiebreaker(executable.map(r => r.rule));
       }
+      let chosen = executable[chosenIndex];
 
       await hooks.selected(chosen.rule, state);
       state = await chosen.action.execute(state);
