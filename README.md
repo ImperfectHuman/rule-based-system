@@ -55,49 +55,20 @@ interpreted as described in RFC 2119.
 For your system to be useful the actions will have to be tailored to it. All
 actions are loaded by the `orchestrator` using an `ActionLoader` (see below).
 
-An action is a class with the following properties and methods:
+An action is a class with the following methods:
 
 * A constructor that takes an action-specific `config` object, which MAY be
   specified by the `Rule` in the `KnowledgeBase`. If not specified `undefined`
   will be passed in instead. The `Action` SHOULD treat this object as read-only.
-* `id` - A string property, acting as an identifier uniquely representing the
-  action. Used during the loading of rules from a serialised form (e.g config
-  file, database) to associate the action with the rule.
-* `async function canExecute(state)` - a function that accepts the state of the
+* `async canExecute(state)` - a function that accepts the state of the
   system and returns `true` or `false` to indicate if the action's preconditions
   are met, and therefore if the action can be performed. This MAY be called very
   frequently, so it SHOULD return following the minimum possible processing.
-* `async function execute(state)` - a function that accepts the state of the
+* `async execute(state)` - a function that accepts the state of the
   system and performs some processing. It MUST return the new state of the
   system after it has processed. It is RECOMMENDED that you decide up-front if
   `execute` functions are allowed to modify the input state that is provided,
   and document that decision appropriately for future maintainers.
-
-Other properties are ignored. This allows you to do things like include a
-"displayName" for user interfaces.
-
-### ActionLoader
-
-In order to process a `Rule` the `Action` needs to be loaded. The `ActionLoader`
-you pass to the `orchestrator` performs this loading, and provides `Action`
-classes as required.
-
-You MAY wish to tune your `ActionLoader` to your system. For example you could
-wish to load each `Action` explicitly to help maintainers keep track of where
-they are linked into the system, or to have a directory of source files each
-of which contains a `Action` definition and are loaded dynamically to reduce
-the amount of code you need to write. Perhaps to lower response times you will
-decide to keep every `Action` in memory, or to lower memory usage decide to only
-have an `Action` loaded while it is required.
-
-An `ActionLoader` is an object that has the following method:
-
-* `async function getAction(id)` - a function that accepts an action identifier
-  and returns the class implementing that action. If an `Action` is requested
-  that cannot be loaded this MUST either throw an error (which will halt
-  processing) or provide a substitute `Action` to be used instead.
-
-Other properties are ignored.
 
 ### Rule
 
@@ -130,6 +101,27 @@ It is NOT RECOMMENDED to pass a reference to the `rules` to the system to allow
 it to be updated by an `Action`, as this could lead to a chaotic system. Using
 the state and `action.canExecute(state)` is likely simpler to understand and
 maintain for most purposes.
+
+
+### ActionLibrary
+
+In order to process a `Rule` the `Action` needs to be loaded. The `ActionLibrary`
+you pass to the `orchestrator` performs this loading, and provides `Action`
+classes as required.
+
+
+`ActionLibrary` has the following methods:
+
+* `addAction(id, actionClass)` - Adds an `Action`, associating it with the given
+  identifier to allow it to be referenced from a `Rule`.
+* `async addActionsFromDir(dirPath)` - Adds all `.js` files from the directory
+  at `dirPath`, loading the exported class as an `Action` with an identifier
+  based on the file name. A file `myAction.js` would have the identifier
+  `myAction`.
+* `getAction(id)` - a function that accepts an action identifier
+  and returns the class implementing that action. If an `Action` is requested
+  that cannot be loaded this MUST either throw an error (which will halt
+  processing) or provide a substitute `Action` to be used instead.
 
 ### orchestrator
 
