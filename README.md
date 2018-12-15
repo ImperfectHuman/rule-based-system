@@ -91,9 +91,6 @@ The knowledge base MUST have the following property:
 
 * `rules` - an Array of `Rule` objects.
 
-Other properties are permitted, but ignored by this system. This has the same
-caveats as the `Rule` objects.
-
 It is NOT RECOMMENDED to pass a reference to the `rules` to the system to allow
 it to be updated by an `Action`, as this could lead to a chaotic system. Using
 the state and `action.canExecute(state)` is likely simpler to understand and
