@@ -1,6 +1,4 @@
 const ActionLibrary = require('../ActionLibrary');
-const fs = require('fs');
-const path = require('path');
 
 describe('ActionLibrary', () => {
 
@@ -30,16 +28,6 @@ describe('ActionLibrary', () => {
   test("fetching an ID that doesn't exist throws an error", () => {
     const lib = new ActionLibrary();
     expect(() => lib.getAction("Foo")).toThrow();
-  });
-
-  test("can load all actions from a directory", async () => {
-    expect.assertions(3);
-    const dirPath = fs.realpathSync(path.join(__dirname,'fixtureActions'));
-    const lib = new ActionLibrary();
-    await lib.addActionsFromDir(dirPath);
-    expect(lib.getAction("AppendA")).toBeInstanceOf(Function);
-    expect(lib.getAction("AppendB")).toBeInstanceOf(Function);
-    expect(lib.getAction("AppendC")).toBeInstanceOf(Function);
   });
 
 

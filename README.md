@@ -105,10 +105,6 @@ you pass to the `orchestrator` does this, providing `Action` classes as required
 
 * `addAction(id, actionClass)` - Adds an `Action`, associating it with the given
   identifier to allow it to be referenced from a `Rule`.
-* `async addActionsFromDir(dirPath)` - Adds all `.js` files from the directory
-  at `dirPath`, loading the exported class as an `Action` with an identifier
-  based on the file name. A file `myAction.js` would have the identifier
-  `myAction`.
 * `getAction(id)` - a function that accepts an action identifier
   and returns the class implementing that action. If an `Action` is requested
   that cannot be loaded this MUST either throw an error (which will halt

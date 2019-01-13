@@ -1,17 +1,17 @@
-const fs = require('fs');
-const path = require('path');
-
 const orchestrator = require("../orchestrator");
 const ActionLibrary = require("../ActionLibrary");
-
-const FIXTURE_ACTION_PATH = fs.realpathSync(path.join(__dirname,'fixtureActions'));
+const AppendA = require("./fixtureActions/AppendA");
+const AppendB = require("./fixtureActions/AppendB");
+const AppendC = require("./fixtureActions/AppendC");
 
 describe("orchestrator", () => {
 
   var actions;
   beforeEach(async () => {
     actions = new ActionLibrary();
-    await actions.addActionsFromDir(FIXTURE_ACTION_PATH);
+    actions.addAction("AppendA", AppendA);
+    actions.addAction("AppendB", AppendB);
+    actions.addAction("AppendC", AppendC);
   });
 
   describe("Rule selection and processing", () => {
