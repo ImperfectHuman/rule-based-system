@@ -17,6 +17,6 @@
   },
   "homepage": "https://github.com/ImperfectHuman/rule-based-system#readme",
   "devDependencies": {
-    "jest": "^23.6.0"
+    "jest": "^24.6.0"
   }
 }
